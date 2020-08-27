@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"watch": "tsc -w",
+		"watch": "rm -rf ./dist && tsc -w",
 		"dev": "nodemon dist/index.js",
 		"start": "node dist/index.js"
 	},
@@ -20,7 +20,8 @@
 		"@mikro-orm/core": "^4.0.0-alpha.0",
 		"@mikro-orm/migrations": "^4.0.0-alpha.0",
 		"@mikro-orm/postgresql": "^4.0.0-alpha.0",
-		"pg": "^8.3.3"
+		"pg": "^8.3.3",
+		"ts-node": "^9.0.0"
 	},
 	"mikro-orm": {
 		"useTsNode": true,
