@@ -2,6 +2,7 @@ import { __prod__ } from './constants';
 import { Post } from './entities/Post';
 import { MikroORM } from '@mikro-orm/core';
 import path from 'path';
+import { User } from './entities/user';
 
 export default {
 	dbName: 'lireddit',
@@ -14,7 +15,7 @@ export default {
 		pattern: /^[\w-]+\d+\.[tj]s$/,
 	},
 	// this will correspond to all our DB tables
-	entities: [Post],
+	entities: [Post, User],
 } as Parameters<typeof MikroORM.init>[0];
 
 // 'as const' is casting to const, so we get to see the whole value or a property and not just

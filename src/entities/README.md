@@ -1,0 +1,1 @@
+You can think of entities as models for our application
