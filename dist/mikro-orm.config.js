@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("./constants");
 const Post_1 = require("./entities/Post");
 const path_1 = __importDefault(require("path"));
-const user_1 = require("./entities/user");
+const User_1 = require("./entities/User");
 exports.default = {
     dbName: 'lireddit',
     user: 'postgres',
@@ -17,6 +17,6 @@ exports.default = {
         path: path_1.default.join(__dirname, './migrations'),
         pattern: /^[\w-]+\d+\.[tj]s$/,
     },
-    entities: [Post_1.Post, user_1.User],
+    entities: [Post_1.Post, User_1.User],
 };
 //# sourceMappingURL=mikro-orm.config.js.map
