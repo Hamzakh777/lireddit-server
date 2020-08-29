@@ -1,7 +1,6 @@
 import { Resolver, Query, Ctx, Arg, Int, Mutation } from 'type-graphql';
 import { Post } from '../entities/Post';
 import { IContext } from 'src/types';
-import { NullValueNode } from 'graphql';
 
 @Resolver()
 export class PostResolver {
@@ -50,5 +49,22 @@ export class PostResolver {
 			em.persistAndFlush(post);
 		}
 		return post;
+	}
+
+	// delete post
+	@Mutation(() => Boolean)
+	async deletePost(
+		@Arg('id') id: number,
+		@Ctx() { em }: IContext
+	): Promise<Boolean> {
+		try {
+			await em.nativeDelete(Post, { id });
+
+			return true;
+		} catch (error) {
+			console.error(error);
+
+			return false;
+		}
 	}
 }
