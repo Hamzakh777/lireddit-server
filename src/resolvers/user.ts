@@ -9,7 +9,6 @@ import {
 } from 'type-graphql';
 import { IContext } from 'src/types';
 import { User } from '../entities/User';
-import { MinLength } from 'class-validator';
 
 @InputType()
 class UserInput {
@@ -17,10 +16,7 @@ class UserInput {
 	username: string;
 
 	@Field()
-	@MinLength(10, {
-		message: 'Password is too short',
-	})
-	password?: string;
+	password: string;
 }
 
 @ObjectType()
@@ -45,16 +41,52 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
 	// register user
-	@Mutation(() => User)
+	@Mutation(() => UserResponse)
 	async register(
 		@Arg('options') options: UserInput,
 		@Ctx() { em }: IContext
-	): Promise<User> {
+	): Promise<UserResponse> {
+		if (options.username.length < 3) {
+			return {
+				errors: [
+					{
+						field: 'username',
+						message: 'Username too short',
+					},
+				],
+			};
+		}
+		if (options.password.length < 8) {
+			return {
+				errors: [
+					{
+						field: 'password',
+						message: 'Password length should be greater than 8',
+					},
+				],
+			};
+		}
 		const user = em.create(User, options);
 		// no password hashing because node argon 2 didn't want to install locally
-		await em.persistAndFlush(user);
+		try {
+			await em.persistAndFlush(user);
+		} catch (error) {
+			if (error.code === '23505') {
+				// username already exists
+				return {
+					errors: [
+						{
+							field: 'username',
+							message: 'User already taken'
+						}
+					]
+				}	
+			}
+		}
 
-		return user;
+		return {
+			user,
+		};
 	}
 
 	// login
