@@ -6,6 +6,7 @@ import {
 	InputType,
 	Field,
 	ObjectType,
+	Query,
 } from 'type-graphql';
 import { IContext } from 'src/types';
 import { User } from '../entities/User';
@@ -40,11 +41,20 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+	@Query(() => User, { nullable: true })
+	async me(@Ctx() { em, req }: IContext) {
+		if (!req.session!.userId) {
+			return null;
+		}
+		const user = await em.findOne(User, { id: req.session!.userId });
+		return user;
+	}
+
 	// register user
 	@Mutation(() => UserResponse)
 	async register(
 		@Arg('options') options: UserInput,
-		@Ctx() { em }: IContext
+		@Ctx() { em, req }: IContext
 	): Promise<UserResponse> {
 		if (options.username.length < 3) {
 			return {
@@ -77,12 +87,17 @@ export class UserResolver {
 					errors: [
 						{
 							field: 'username',
-							message: 'User already taken'
-						}
-					]
-				}	
+							message: 'User already taken',
+						},
+					],
+				};
 			}
 		}
+		
+		// store user id session
+		// this will set a cookie on the user
+		// keep them logged in
+		req.session!.userId = user.id;
 
 		return {
 			user,
@@ -93,7 +108,7 @@ export class UserResolver {
 	@Mutation(() => UserResponse)
 	async login(
 		@Arg('options') options: UserInput,
-		@Ctx() { em }: IContext
+		@Ctx() { em, req }: IContext
 	): Promise<UserResponse> {
 		const user = await em.findOne(User, { username: options.username });
 		if (!user) {
@@ -118,6 +133,8 @@ export class UserResolver {
 				],
 			};
 		}
+
+		req.session!.userId = user.id;
 
 		return {
 			user,

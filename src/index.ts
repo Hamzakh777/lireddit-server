@@ -28,6 +28,7 @@ const main = async () => {
 			store: new RedisStore({ client: redisClient, disableTouch: true }),
 			secret: 'keyboard cat',
 			resave: false,
+			saveUninitialized: false, // don't store any sessions if there's no data
 			cookie: {
 				httpOnly: true, // will not be able to acces the cookie using just JS
 				maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
